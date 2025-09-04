@@ -13,7 +13,7 @@ private:
     Uint32 color;
 
 public:
-    Polygon() : color(0xFFFFFFFF) {} // Construtor padrão
+    Polygon() : color(0xFFFFFFFF) {}
 
     Polygon(const std::vector<Point>& points, Uint32 color)
         : points(points), color(color) {}
@@ -36,6 +36,12 @@ public:
     std::vector<Point>& getPoints() { return points; }
 
     void setColor(Uint32 newColor) { color = newColor; }
+
+    void normalize(float metersX, float metersY, int screenWidth, int screenHeight) {
+        for (auto& point : points) {
+            point.normalize(metersX, metersY, screenWidth, screenHeight);
+        }
+    }
 };
 
 #endif

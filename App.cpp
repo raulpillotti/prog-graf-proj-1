@@ -139,6 +139,12 @@ void parseCSV(const std::string& filename,
 
     bool screenConfigured = false;
 
+    // Instanciar variáveis locais para evitar múltiplas chamadas
+    int screenWidth = app.getWidth();
+    int screenHeight = app.getHeight();
+    float metersX = app.getMetersX();
+    float metersY = app.getMetersY();
+
     while (std::getline(file, line)) {
         if (line.empty()) continue;
 
@@ -151,51 +157,53 @@ void parseCSV(const std::string& filename,
         }
         if (tokens.empty()) continue;
 
+        // ---------------- CONFIGURAÇÃO DA TELA ----------------
         if (!screenConfigured) {
             if (tokens[0] == "Resolucao" && tokens.size() >= 3) {
-                int w = std::stoi(tokens[1]);
-                int h = std::stoi(tokens[2]);
-                app.setResolution(w, h);
+                screenWidth = std::stoi(tokens[1]);
+                screenHeight = std::stoi(tokens[2]);
+                app.setResolution(screenWidth, screenHeight);
             }
             else if (tokens[0] == "Metros" && tokens.size() >= 3) {
-                float mx = std::stof(tokens[1]);
-                float my = std::stof(tokens[2]);
-                app.setMeters(mx, my);
+                metersX = std::stof(tokens[1]);
+                metersY = std::stof(tokens[2]);
+                app.setMeters(metersX, metersY);
             }
             else if (tokens[0] == "Cor" && tokens.size() >= 2) {
-                Uint32 color = parseColor(tokens[1]);
+                color = parseColor(tokens[1]);
                 app.setBgColor(color);
                 screenConfigured = true;
             }
             continue;
         }
 
+        // ---------------- OBJETOS ----------------
         if (tokens[0] == "Casa") {
             houses.push_back(House());
             currentHouse = &houses.back();
-            currentTree  = nullptr;
+            currentTree = nullptr;
             currentFence = nullptr;
-            currentSun   = nullptr;
+            currentSun = nullptr;
         }
         else if (tokens[0] == "Arvore") {
             trees.push_back(Tree());
-            currentTree  = &trees.back();
+            currentTree = &trees.back();
             currentHouse = nullptr;
             currentFence = nullptr;
-            currentSun   = nullptr;
+            currentSun = nullptr;
         }
         else if (tokens[0] == "Cerca") {
             fences.push_back(Fence());
             currentFence = &fences.back();
             currentHouse = nullptr;
-            currentTree  = nullptr;
-            currentSun   = nullptr;
+            currentTree = nullptr;
+            currentSun = nullptr;
         }
         else if (tokens[0] == "Sol") {
             suns.push_back(Sun());
-            currentSun   = &suns.back();
+            currentSun = &suns.back();
             currentHouse = nullptr;
-            currentTree  = nullptr;
+            currentTree = nullptr;
             currentFence = nullptr;
         }
         else if (tokens[0] == "Localizacao") {
@@ -212,6 +220,7 @@ void parseCSV(const std::string& filename,
             color = parseColor(tokens[1]);
         }
 
+        // ---------------- APLICA GEOMETRIA ----------------
         if (currentHouse) {
             currentHouse->getWall().setPoints({
                 {x, y}, {x+width, y}, {x+width, y-height}, {x, y-height}
@@ -232,6 +241,11 @@ void parseCSV(const std::string& filename,
                 {x+0.4f*width, y-0.5f*height}
             });
             currentHouse->getDoor().setColor(color);
+
+            // Normaliza todos os polígonos da casa
+            currentHouse->getWall().normalize(metersX, metersY, screenWidth, screenHeight);
+            currentHouse->getRoof().normalize(metersX, metersY, screenWidth, screenHeight);
+            currentHouse->getDoor().normalize(metersX, metersY, screenWidth, screenHeight);
         }
         else if (currentTree) {
             currentTree->getTrunk().setPoints({
@@ -246,36 +260,26 @@ void parseCSV(const std::string& filename,
                 {x+width*0.15f, y-height}
             });
             currentTree->getLeaves().setColor(color);
+
+            currentTree->getTrunk().normalize(metersX, metersY, screenWidth, screenHeight);
+            currentTree->getLeaves().normalize(metersX, metersY, screenWidth, screenHeight);
         }
         else if (currentFence) {
             currentFence->getPost().setPoints({
                 {x, y}, {x+width, y}, {x+width, y-height}, {x, y-height}
             });
             currentFence->getPost().setColor(color);
+
+            currentFence->getPost().normalize(metersX, metersY, screenWidth, screenHeight);
         }
         else if (currentSun) {
             currentSun->getBody().setPoints({
                 {x, y}, {x+width, y}, {x+width, y-height}, {x, y-height}
             });
             currentSun->getBody().setColor(color);
-        }
-    }
-}
 
-void App::handleEvents() {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT) {
-            running = false;
+            currentSun->getBody().normalize(metersX, metersY, screenWidth, screenHeight);
         }
-        if (event.type == SDL_WINDOWEVENT &&
-            event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-            surface = SDL_GetWindowSurface(window);
-            width = surface->w;
-            height = surface->h;
-            std::cout << "Size changed: " << width << ", " << height << "\n";
-        }
-
     }
 }
 
@@ -309,5 +313,22 @@ void App::setBgColor(Uint32 color) {
     if (surface) {
         SDL_FillRect(surface, nullptr, bgColor);
         SDL_UpdateWindowSurface(window);
+    }
+}
+
+void App::handleEvents() {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            running = false;
+        }
+        if (event.type == SDL_WINDOWEVENT &&
+            event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+            surface = SDL_GetWindowSurface(window);
+            width = surface->w;
+            height = surface->h;
+            std::cout << "Size changed: " << width << ", " << height << "\n";
+        }
+
     }
 }
