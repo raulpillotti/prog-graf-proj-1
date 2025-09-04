@@ -5,7 +5,7 @@
 
 class Sun : public Shape {
 private:
-    Polygon body; // o sol é representado por um polígono
+    Polygon body;
 
 public:
     Sun() = default;

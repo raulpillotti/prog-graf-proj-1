@@ -19,8 +19,8 @@ void parseCSV(const std::string& filename,
               std::vector<House>& houses,
               std::vector<Tree>& trees,
               std::vector<Fence>& fences,
-              std::vector<Sun>& suns);
-
+              std::vector<Sun>& suns,
+              App& app);
 
 App::App(const std::string& title, int w, int h)
     : window(nullptr), surface(nullptr), running(false),
@@ -57,10 +57,10 @@ void App::run() {
     std::vector<Fence> fences;
     std::vector<Sun> suns;
 
-    // Carregar a cena do CSV
-    parseCSV("Exemplo.csv", houses, trees, fences, suns);
+    clear(255, 255, 255);
 
-    // ---- DEBUG: printar os objetos carregados ----
+    parseCSV("Exemplo.csv", houses, trees, fences, suns, *this);
+
     std::cout << "Casas encontradas: " << houses.size() << std::endl;
     for (int i = 0; i < houses.size(); ++i) {
         std::cout << "Casa " << i
@@ -94,40 +94,11 @@ void App::run() {
     }
 
     while (running) {
-
-        // Limpar fundo
-        clear(255, 255, 255);
-
         Uint32 red = Primitives::rgbToUint32(surface, 255, 0, 0);
         Uint32 green = Primitives::rgbToUint32(surface, 0, 255, 0);
         Uint32 blue = Primitives::rgbToUint32(surface, 0, 0, 255);
         Uint32 black = Primitives::rgbToUint32(surface, 0, 0, 0);
-        Point p1(10, 32);
-        Point p2(30, 65);
-        Point p3(100, 21);
-        Point p4(46, 90);
-
-        std::vector<Point> points = {p1, p2, p3, p4};
-
-        Polygon pol(points, blue);
-        pol.draw(surface);
-
-        // Criar um retângulo vermelho
-       // Rectangle rect(50, 50, 200, 150, red);
-        //rect.draw(surface);
-
-        //Circle circ(300, 300, 100, black);
-        //circ.draw(surface);
-
-        //CircleFilled circf(300, 300, 70, green);
-        //circf.draw(surface);
-
-        //CircleFilledAA circfa(500, 100, 70, blue);
-        //circfa.draw(surface);
-
         handleEvents();
-
-        // Atualizar tela
         present();
     }
 }
@@ -140,26 +111,33 @@ Uint32 parseColor(const std::string& color) {
     if (color == "Lima") return 0x32CD32;
     if (color == "Azul") return 0x0000FF;
     if (color == "Laranja") return 0xFFA500;
+    if (color == "Azul") return 0x0000FF;
     return 0xFFFFFF;
 }
 
 void parseCSV(const std::string& filename,
-                   std::vector<House>& houses,
-                   std::vector<Tree>& trees,
-                   std::vector<Fence>& fences,
-                   std::vector<Sun>& suns) {
-
+              std::vector<House>& houses,
+              std::vector<Tree>& trees,
+              std::vector<Fence>& fences,
+              std::vector<Sun>& suns,
+              App& app)
+{
     std::ifstream file(filename);
-    if (!file.is_open()) return;
+    if (!file.is_open()) {
+        std::cerr << "Erro ao abrir arquivo: " << filename << std::endl;
+        return;
+    }
 
     std::string line;
     House* currentHouse = nullptr;
-    Tree* currentTree = nullptr;
+    Tree* currentTree   = nullptr;
     Fence* currentFence = nullptr;
-    Sun* currentSun = nullptr; // <--- adicionado
+    Sun* currentSun     = nullptr;
 
     float x = 0, y = 0, width = 1, height = 1;
     Uint32 color = 0xFFFFFF;
+
+    bool screenConfigured = false;
 
     while (std::getline(file, line)) {
         if (line.empty()) continue;
@@ -167,37 +145,57 @@ void parseCSV(const std::string& filename,
         std::stringstream ss(line);
         std::string token;
         std::vector<std::string> tokens;
+
         while (std::getline(ss, token, ';')) {
             tokens.push_back(token);
         }
         if (tokens.empty()) continue;
 
+        if (!screenConfigured) {
+            if (tokens[0] == "Resolucao" && tokens.size() >= 3) {
+                int w = std::stoi(tokens[1]);
+                int h = std::stoi(tokens[2]);
+                app.setResolution(w, h);
+            }
+            else if (tokens[0] == "Metros" && tokens.size() >= 3) {
+                float mx = std::stof(tokens[1]);
+                float my = std::stof(tokens[2]);
+                app.setMeters(mx, my);
+            }
+            else if (tokens[0] == "Cor" && tokens.size() >= 2) {
+                Uint32 color = parseColor(tokens[1]);
+                app.setBgColor(color);
+                screenConfigured = true;
+            }
+            continue;
+        }
+
         if (tokens[0] == "Casa") {
             houses.push_back(House());
             currentHouse = &houses.back();
-            currentTree = nullptr;
+            currentTree  = nullptr;
             currentFence = nullptr;
-            currentSun = nullptr; // <--- reset
+            currentSun   = nullptr;
         }
         else if (tokens[0] == "Arvore") {
             trees.push_back(Tree());
-            currentTree = &trees.back();
+            currentTree  = &trees.back();
             currentHouse = nullptr;
             currentFence = nullptr;
-            currentSun = nullptr;
+            currentSun   = nullptr;
         }
         else if (tokens[0] == "Cerca") {
             fences.push_back(Fence());
             currentFence = &fences.back();
             currentHouse = nullptr;
-            currentTree = nullptr;
-            currentSun = nullptr;
+            currentTree  = nullptr;
+            currentSun   = nullptr;
         }
         else if (tokens[0] == "Sol") {
             suns.push_back(Sun());
-            currentSun = &suns.back();
+            currentSun   = &suns.back();
             currentHouse = nullptr;
-            currentTree = nullptr;
+            currentTree  = nullptr;
             currentFence = nullptr;
         }
         else if (tokens[0] == "Localizacao") {
@@ -215,30 +213,54 @@ void parseCSV(const std::string& filename,
         }
 
         if (currentHouse) {
-            currentHouse->getWall().setPoints({{x, y}, {x+width, y}, {x+width, y-height}, {x, y-height}});
+            currentHouse->getWall().setPoints({
+                {x, y}, {x+width, y}, {x+width, y-height}, {x, y-height}
+            });
             currentHouse->getWall().setColor(color);
-            currentHouse->getRoof().setPoints({{x-0.1f*width, y-height}, {x+1.1f*width, y-height}, {x+width/2, y-height-height/2}});
+
+            currentHouse->getRoof().setPoints({
+                {x-0.1f*width, y-height},
+                {x+1.1f*width, y-height},
+                {x+width/2, y-height-height/2}
+            });
             currentHouse->getRoof().setColor(color);
-            currentHouse->getDoor().setPoints({{x+0.4f*width, y}, {x+0.6f*width, y}, {x+0.6f*width, y-0.5f*height}, {x+0.4f*width, y-0.5f*height}});
+
+            currentHouse->getDoor().setPoints({
+                {x+0.4f*width, y},
+                {x+0.6f*width, y},
+                {x+0.6f*width, y-0.5f*height},
+                {x+0.4f*width, y-0.5f*height}
+            });
             currentHouse->getDoor().setColor(color);
         }
         else if (currentTree) {
-            currentTree->getTrunk().setPoints({{x, y}, {x+width*0.3f, y}, {x+width*0.3f, y-height*0.5f}, {x, y-height*0.5f}});
+            currentTree->getTrunk().setPoints({
+                {x, y}, {x+width*0.3f, y},
+                {x+width*0.3f, y-height*0.5f}, {x, y-height*0.5f}
+            });
             currentTree->getTrunk().setColor(color);
-            currentTree->getLeaves().setPoints({{x-width*0.2f, y-height*0.5f}, {x+width*0.5f, y-height*0.5f}, {x+width*0.15f, y-height}});
+
+            currentTree->getLeaves().setPoints({
+                {x-width*0.2f, y-height*0.5f},
+                {x+width*0.5f, y-height*0.5f},
+                {x+width*0.15f, y-height}
+            });
             currentTree->getLeaves().setColor(color);
         }
         else if (currentFence) {
-            currentFence->getPost().setPoints({{x, y}, {x+width, y}, {x+width, y-height}, {x, y-height}});
+            currentFence->getPost().setPoints({
+                {x, y}, {x+width, y}, {x+width, y-height}, {x, y-height}
+            });
             currentFence->getPost().setColor(color);
         }
         else if (currentSun) {
-            currentSun->getBody().setPoints({{x, y}, {x+width, y}, {x+width, y-height}, {x, y-height}});
+            currentSun->getBody().setPoints({
+                {x, y}, {x+width, y}, {x+width, y-height}, {x, y-height}
+            });
             currentSun->getBody().setColor(color);
         }
     }
 }
-
 
 void App::handleEvents() {
     SDL_Event event;
@@ -264,4 +286,28 @@ void App::clear(Uint8 r, Uint8 g, Uint8 b) {
 
 void App::present() {
     SDL_UpdateWindowSurface(window);
+}
+
+void App::setResolution(int w, int h) {
+    width = w;
+    height = h;
+    if (window) {
+        SDL_SetWindowSize(window, w, h);
+        surface = SDL_GetWindowSurface(window);
+    }
+}
+
+void App::setMeters(float mx, float my) {
+    metersX = mx;
+    metersY = my;
+}
+
+void App::setBgColor(Uint32 color) {
+    bgColor = color;
+    std::cout << "Background color set to: 0x"
+                 << std::hex << bgColor << std::dec << std::endl;
+    if (surface) {
+        SDL_FillRect(surface, nullptr, bgColor);
+        SDL_UpdateWindowSurface(window);
+    }
 }
