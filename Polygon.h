@@ -1,47 +1,35 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
-#include <SDL2/SDL.h>
 #include "Shape.h"
 #include "Point.h"
-#include "Primitives.h"
+#include "matrix.h"
 #include <vector>
+#include <SDL2/SDL.h>
 
 class Polygon : public Shape {
 private:
-    std::vector<Point> points;
+    std::vector<Point> worldPoints;
+    std::vector<Point> normalizedPoints;
     Uint32 color;
 
 public:
     Polygon() : color(0xFFFFFFFF) {}
 
-    Polygon(const std::vector<Point>& points, Uint32 color)
-        : points(points), color(color) {}
+    // Define os pontos no sistema de coordenadas do mundo
+    void setPoints(const std::vector<Point>& newPoints);
 
-    void draw(SDL_Surface* surface) override {
-        if (!surface) return;
+    // Define a cor de preenchimento
+    void setColor(Uint32 newColor);
 
-        for (size_t i = 0; i < points.size() - 1; i++) {
-            Point src = points[i];
-            Point dest = points[i + 1];
+    // NEW: Aplica uma matriz de transformação (ex: rotação) aos pontos do mundo
+    void transform(const Matrix& m);
 
-            Primitives::drawLine(surface, src.x, src.y, dest.x, dest.y, color);
-        }
-    }
+    // MODIFIED: Converte os worldPoints em normalizedPoints sem destruir os originais
+    void normalize(float metersX, float metersY, int screenWidth, int screenHeight);
 
-    void setPoints(const std::vector<Point>& newPoints) {
-        points = newPoints;
-    }
-
-    std::vector<Point>& getPoints() { return points; }
-
-    void setColor(Uint32 newColor) { color = newColor; }
-
-    void normalize(float metersX, float metersY, int screenWidth, int screenHeight) {
-        for (auto& point : points) {
-            point.normalize(metersX, metersY, screenWidth, screenHeight);
-        }
-    }
+    // MODIFIED: O desenho agora preenche o polígono e será implementado no .cpp
+    void draw(SDL_Surface* surface) override;
 };
 
 #endif

@@ -1,53 +1,52 @@
 #ifndef RECTANGLE_H
 #define RECTANGLE_H
 
-#include <SDL2/SDL.h>
 #include "Shape.h"
 #include "Primitives.h"
+#include "Point.h" // Incluído para usar a classe Point
+#include <SDL2/SDL.h>
+#include <algorithm> // Para std::min/max
 
 class Rectangle : public Shape {
 private:
-    int x1, y1, x2, y2;
+    // MUDANÇA: Armazena os cantos opostos como Pontos, contendo coords de mundo e tela
+    Point p1;
+    Point p2;
     Uint32 color;
 
 public:
-    Rectangle(int x1, int y1, int x2, int y2, Uint32 color)
-        : x1(x1), y1(y1), x2(x2), y2(y2), color(color) {}
+    // MUDANÇA: Construtor agora aceita coordenadas do mundo (floats)
+    Rectangle(float world_x1, float world_y1, float world_x2, float world_y2, Uint32 color)
+        : p1(world_x1, world_y1), p2(world_x2, world_y2), color(color) {}
 
+    // NOVO: Método para normalizar as coordenadas do mundo para a tela
+    void normalize(float metersX, float metersY, int screenWidth, int screenHeight) {
+        p1.normalize(metersX, metersY, screenWidth, screenHeight);
+        p2.normalize(metersX, metersY, screenWidth, screenHeight);
+    }
+
+    // MUDANÇA: O método de desenho agora usa as coordenadas de tela (screen_)
+    // e foi otimizado para desenhar linhas.
     void draw(SDL_Surface* surface) override {
         if (!surface) return;
 
-        // Desenhar retângulo preenchido usando Primitives
-        for (int y = y1; y < y2; y++) {
-            for (int x = x1; x < x2; x++) {
-                Primitives::setPixel(surface, x, y, color);
-            }
+        // Garante que desenhamos do canto superior esquerdo para o inferior direito
+        int startX = std::min(p1.screen_x, p2.screen_x);
+        int startY = std::min(p1.screen_y, p2.screen_y);
+        int endX = std::max(p1.screen_x, p2.screen_x);
+        int endY = std::max(p1.screen_y, p2.screen_y);
+
+        // Desenha o retângulo preenchido usando linhas horizontais
+        for (int y = startY; y < endY; y++) {
+            Primitives::drawLine(surface, startX, y, endX, y, color);
         }
-
-        // Alternativamente, poderia usar apenas as arestas:
-        // Primitives::drawLine(surface, x1, y1, x2, y1, color); // topo
-        // Primitives::drawLine(surface, x1, y2, x2, y2, color); // base
-        // Primitives::drawLine(surface, x1, y1, x1, y2, color); // esquerda
-        // Primitives::drawLine(surface, x2, y1, x2, y2, color); // direita
     }
 
-    int getX1() {
-        return x1;
-    }
-
-    int getY1() {
-        return y1;
-    }
-
-    int getX2() {
-        return x2;
-    }
-
-    int getY2() {
-        return y2;
-    }
-
+    // MUDANÇA: Getters atualizados para retornar coordenadas de tela
+    int getScreenX1() const { return p1.screen_x; }
+    int getScreenY1() const { return p1.screen_y; }
+    int getScreenX2() const { return p2.screen_x; }
+    int getScreenY2() const { return p2.screen_y; }
 };
 
 #endif
-

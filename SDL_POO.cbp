@@ -39,17 +39,42 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="include/App.h" />
-		<Unit filename="include/Circle.h" />
-		<Unit filename="include/CircleFilled.h" />
-		<Unit filename="include/CircleFilledAA.h" />
-		<Unit filename="include/Point.h" />
-		<Unit filename="include/Primitives.h" />
-		<Unit filename="include/Rectangle.h" />
-		<Unit filename="include/Shape.h" />
-		<Unit filename="main.cpp" />
-		<Unit filename="src/App.cpp" />
-		<Unit filename="src/Primitives.cpp" />
+        <Unit filename="include/App.h" />
+        <Unit filename="include/Circle.h" />
+        <Unit filename="include/CircleFilled.h" />
+        <Unit filename="include/CircleFilledAA.h" />
+        <Unit filename="include/Point.h" />
+        <Unit filename="include/Primitives.h" />
+        <Unit filename="include/Rectangle.h" />
+        <Unit filename="include/Shape.h" />
+        <Unit filename="main.cpp" />
+        <Unit filename="src/App.cpp" />
+        <Unit filename="src/Primitives.cpp" />
+        <Unit filename="include/Sun.h" />
+        <Unit filename="include/Button.h" />
+        <Unit filename="include/Circle.h" />
+        <Unit filename="include/Point.h" />
+        <Unit filename="src/Fence.cpp" />
+        <Unit filename="include/CircleFilled.h" />
+        <Unit filename="src/Primitives.cpp" />
+        <Unit filename="include/Rectangle.h" />
+        <Unit filename="include/Primitives.h" />
+        <Unit filename="src/matrix.cpp" />
+        <Unit filename="include/House.h" />
+        <Unit filename="src/House.cpp" />
+        <Unit filename="src/Sun.cpp" />
+        <Unit filename="include/Polygon.h" />
+        <Unit filename="src/Tree.cpp" />
+        <Unit filename="src/App.cpp" />
+        <Unit filename="include/CircleFilledAA.h" />
+        <Unit filename="include/matrix.h" />
+        <Unit filename="include/App.h" />
+        <Unit filename="include/Fence.h" />
+        <Unit filename="src/CircleFilledAA.cpp" />
+        <Unit filename="src/circle.cpp" />
+        <Unit filename="src/Polygon.cpp" />
+        <Unit filename="include/Shape.h" />
+        <Unit filename="include/Tree.h" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

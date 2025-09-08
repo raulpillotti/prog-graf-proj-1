@@ -1,52 +1,26 @@
 #ifndef CIRCLE_FILLED_AA_H
 #define CIRCLE_FILLED_AA_H
 
-#include <SDL2/SDL.h>
-#include <cmath>
 #include "Shape.h"
 #include "Primitives.h"
+#include "Point.h" 
+#include <SDL2/SDL.h>
+#include <cmath>
 
 class CircleFilledAA : public Shape {
 private:
-    int xc, yc;     // centro
-    int radius;     // raio
+    Point center;
+    float world_radius;
     Uint32 color;
 
+    int screen_radius;
+
 public:
-    CircleFilledAA(int xc, int yc, int radius, Uint32 color)
-        : xc(xc), yc(yc), radius(radius), color(color) {}
+    CircleFilledAA(Point center = Point(0,0), float radius = 0, Uint32 color = 0);
 
-    void draw(SDL_Surface* surface) override {
-        if (!surface) return;
+    void normalize(float metersX, float metersY, int screenWidth, int screenHeight) override;
 
-        Uint8 r, g, b;
-        SDL_GetRGB(color, surface->format, &r, &g, &b);
-
-        for (int y = -radius - 1; y <= radius + 1; y++) {
-            for (int x = -radius - 1; x <= radius + 1; x++) {
-                float dist = std::sqrt(float(x*x + y*y));
-                float coverage = radius + 0.5f - dist;
-
-                if (coverage > 0) {
-                    // Limita cobertura entre 0 e 1
-                    if (coverage > 1) coverage = 1.0f;
-
-                    Uint32 pixelColor = Primitives::getPixel(surface, xc + x, yc + y);
-
-                    Uint8 pr, pg, pb;
-                    SDL_GetRGB(pixelColor, surface->format, &pr, &pg, &pb);
-
-                    // mistura cor do pixel atual com a cor do círculo
-                    Uint8 nr = (Uint8)(pr * (1 - coverage) + r * coverage);
-                    Uint8 ng = (Uint8)(pg * (1 - coverage) + g * coverage);
-                    Uint8 nb = (Uint8)(pb * (1 - coverage) + b * coverage);
-
-                    Uint32 newColor = SDL_MapRGB(surface->format, nr, ng, nb);
-                    Primitives::setPixel(surface, xc + x, yc + y, newColor);
-                }
-            }
-        }
-    }
+    void draw(SDL_Surface* surface) override;
 };
 
 #endif

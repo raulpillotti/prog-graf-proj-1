@@ -1,20 +1,28 @@
 #ifndef SUN_H
 #define SUN_H
 
-#include "Polygon.h"
+#include "Shape.h"
+#include "CircleFilledAA.h" // MUDANÇA: Incluído para usar a primitiva de círculo
+#include "Point.h"
 
 class Sun : public Shape {
 private:
-    Polygon body;
+    // MUDANÇA: O corpo do sol agora é um círculo com anti-aliasing para suavidade
+    CircleFilledAA body;
 
 public:
-    Sun() = default;
+    // Construtor padrão
+    Sun();
 
-    void draw(SDL_Surface* surface) override {
-        body.draw(surface);
-    }
+    // NOVO: Método para construir o sol a partir dos dados do CSV
+    void build(float x, float y, float width, float height, Uint32 color);
 
-    Polygon& getBody() { return body; }
+    // MUDANÇA: Agora implementa o método normalize, conforme exigido por Shape
+    void normalize(float metersX, float metersY, int screenWidth, int screenHeight) override;
+
+    // O método draw chama o draw do círculo interno
+    void draw(SDL_Surface* surface) override;
 };
 
 #endif
+

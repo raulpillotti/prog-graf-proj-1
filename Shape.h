@@ -3,12 +3,14 @@
 
 #include <SDL2/SDL.h>
 
-// Classe abstrata (interface para todas as figuras)
 class Shape {
 public:
     virtual ~Shape() {}
-    virtual void draw(SDL_Surface* surface) = 0; // método puro virtual
+
+
+    virtual void normalize(float metersX, float metersY, int screenWidth, int screenHeight) = 0;
+
+    virtual void draw(SDL_Surface* surface) = 0;
 };
 
 #endif
-

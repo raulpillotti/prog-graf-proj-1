@@ -2,6 +2,8 @@
 #define HOUSE_H
 
 #include "Polygon.h"
+#include "Shape.h"
+#include <vector>
 
 class House : public Shape {
 private:
@@ -10,17 +12,14 @@ private:
     Polygon door;
 
 public:
-    House() = default;
+    House();
 
-    void draw(SDL_Surface* surface) override {
-        wall.draw(surface);
-        roof.draw(surface);
-        door.draw(surface);
-    }
+    void build(float x, float y, float width, float height, Uint32 wallColor, Uint32 roofColor, Uint32 doorColor);
 
-    Polygon& getWall() { return wall; }
-    Polygon& getRoof() { return roof; }
-    Polygon& getDoor() { return door; }
+    void normalize(float metersX, float metersY, int screenWidth, int screenHeight) override;
+
+    void draw(SDL_Surface* surface) override;
 };
 
 #endif
+

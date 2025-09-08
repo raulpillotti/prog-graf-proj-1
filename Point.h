@@ -5,20 +5,31 @@
 
 class Point {
 public:
-    float x;
-    float y;
+    // Coordenadas originais no "mundo", em metros (SRU)
+    float world_x;
+    float world_y;
+
+    // Coordenadas calculadas na "tela", em pixels (SRD)
+    int screen_x;
+    int screen_y;
 
 public:
-    Point(float x, float y)
-        : x(x), y(y) {}
+    Point(float wx = 0.0f, float wy = 0.0f)
+        : world_x(wx), world_y(wy), screen_x(0), screen_y(0) {}
 
     void normalize(float metersX, float metersY, int screenWidth, int screenHeight) {
-        if (metersX > 0.0f) x = (x / metersX) * screenWidth;
-        if (metersY > 0.0f) y = (y / metersY) * screenHeight;
+        if (metersX <= 0.0f || metersY <= 0.0f) return;
+
+        screen_x = static_cast<int>((world_x / metersX) * screenWidth);
+
+        // Inverte o eixo Y para que (0,0) do mundo (inferior-esquerdo)
+        // corresponda ao sistema da tela (superior-esquerdo)
+        screen_y = static_cast<int>(screenHeight - (world_y / metersY) * screenHeight);
     }
 
     void print() const {
-        std::cout << "Point: (" << x << ", " << y << ")" << std::endl;
+        std::cout << "Point World: (" << world_x << ", " << world_y << ") "
+                  << "-> Screen: (" << screen_x << ", " << screen_y << ")" << std::endl;
     }
 };
 

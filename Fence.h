@@ -2,21 +2,22 @@
 #define FENCE_H
 
 #include "Polygon.h"
-#include "Point.h"
+#include "Shape.h"
 #include <vector>
 
 class Fence : public Shape {
 private:
-    Polygon post;
+    Polygon post; 
 
 public:
-    Fence() = default;
+    Fence();
 
-    void draw(SDL_Surface* surface) override {
-        post.draw(surface);
-    }
+    void build(float x, float y, float width, float height, Uint32 color, float inclination);
 
-    Polygon& getPost() { return post; }
+    void normalize(float metersX, float metersY, int screenWidth, int screenHeight) override;
+
+    void draw(SDL_Surface* surface) override;
 };
 
 #endif
+
