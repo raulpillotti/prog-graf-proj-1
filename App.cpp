@@ -84,7 +84,7 @@ void App::parseCSV(const std::string& filename) {
             houses.back().build(x, y, width, height, c1, c2, c3);
         } else if (currentObjectType == "Arvore") {
             trees.emplace_back();
-            trees.back().build(x, y, width, height, c1, c2, inclination);
+            trees.back().build(x, y - height, width, height, c1, c2, inclination);
         } else if (currentObjectType == "Cerca") {
             fences.emplace_back();
             fences.back().build(x, y, width, height, c1, inclination);
@@ -129,8 +129,9 @@ void App::parseCSV(const std::string& filename) {
         else if (key == "Cor" && currentObjectType == "None") setBgColor(parseColor(value));
         else if (key == "Localizacao" && tokens.size() >= 3) {
             x = std::stof(value);
-
-            y = metersY - std::stof(tokens[2]);
+            y = std::stof(tokens[2]);
+            // float y1 = metersY - std::stof(tokens[2]);
+            // printf("y: %f %f\n", y1, y);
         }
         else if (key == "Altura") height = std::stof(value);
         else if (key == "Largura") width = std::stof(value);
@@ -182,6 +183,7 @@ void App::setResolution(int w, int h) {
 void App::setMeters(float mx, float my) {
     metersX = mx;
     metersY = my;
+    std::cout << "metersX = " << metersX << ", metersY = " << metersY << std::endl;
 }
 
 void App::setBgColor(Uint32 color) {
@@ -203,4 +205,3 @@ Uint32 parseColor(const std::string& colorStr) {
     if (color == "Laranja") return 0xFFA500;
     return 0xFFFFFF;
 }
-

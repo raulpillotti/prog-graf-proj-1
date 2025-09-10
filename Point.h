@@ -24,7 +24,8 @@ public:
 
         // Inverte o eixo Y para que (0,0) do mundo (inferior-esquerdo)
         // corresponda ao sistema da tela (superior-esquerdo)
-        screen_y = static_cast<int>(screenHeight - (world_y / metersY) * screenHeight);
+        screen_y = static_cast<int>(((metersY - world_y) / metersY) * screenHeight);
+        this->print();
     }
 
     void print() const {
