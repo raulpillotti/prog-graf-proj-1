@@ -4,7 +4,10 @@
 
 House::House() {}
 
-void House::build(float x, float y, float width, float height, Uint32 wallColor, Uint32 roofColor, Uint32 doorColor) {
+void House::build(float x, float y, float width, float height,
+                  Uint32 wallColor, Uint32 roofColor, Uint32 doorColor,
+                  float inclination) {
+    // Parede
     wall.setPoints({
         Point(x, y),
         Point(x + width, y),
@@ -13,6 +16,7 @@ void House::build(float x, float y, float width, float height, Uint32 wallColor,
     });
     wall.setColor(wallColor);
 
+    // Telhado
     float roofHeight = height * 0.5f;
     float roofOverhang = width * 0.1f;
     roof.setPoints({
@@ -22,6 +26,7 @@ void House::build(float x, float y, float width, float height, Uint32 wallColor,
     });
     roof.setColor(roofColor);
 
+    // Porta
     float doorWidth = width * 0.25f;
     float doorHeight = height * 0.6f;
     float doorX = x + (width - doorWidth) / 2.0f;
@@ -32,7 +37,18 @@ void House::build(float x, float y, float width, float height, Uint32 wallColor,
         Point(doorX, y + doorHeight)
     });
     door.setColor(doorColor);
+
+    // Inclinação
+    if (inclination != 0.0f) {
+        Point pivot(x + width / 2.0f, y);
+        Matrix rotationMatrix = Matrix::rotation(inclination, pivot);
+
+        wall.transform(rotationMatrix);
+        roof.transform(rotationMatrix);
+        door.transform(rotationMatrix);
+    }
 }
+
 
 void House::normalize(float metersX, float metersY, int screenWidth, int screenHeight) {
     wall.normalize(metersX, metersY, screenWidth, screenHeight);

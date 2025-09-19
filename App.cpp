@@ -81,7 +81,7 @@ void App::parseCSV(const std::string& filename) {
     auto buildCurrentObject = [&]() {
         if (currentObjectType == "Casa") {
             houses.emplace_back();
-            houses.back().build(x, y - height, width, height, c1, c2, c3);
+            houses.back().build(x, y - height, width, height, c1, c2, c3, inclination);
         } else if (currentObjectType == "Arvore") {
             trees.emplace_back();
             trees.back().build(x, y - height, width, height, c1, c2, inclination);

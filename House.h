@@ -14,7 +14,7 @@ private:
 public:
     House();
 
-    void build(float x, float y, float width, float height, Uint32 wallColor, Uint32 roofColor, Uint32 doorColor);
+    void build(float x, float y, float width, float height, Uint32 wallColor, Uint32 roofColor, Uint32 doorColor, float inclination);
 
     void normalize(float metersX, float metersY, int screenWidth, int screenHeight) override;
 
@@ -22,4 +22,3 @@ public:
 };
 
 #endif
-
