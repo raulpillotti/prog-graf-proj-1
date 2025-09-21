@@ -6,10 +6,6 @@
 #include <string>
 #include <vector>
 
-#include "Polygon.h"
-#include "Point.h"
-#include "Primitives.h"
-
 
 Uint32 parseColor(const std::string& colorStr);
 

@@ -5,11 +5,11 @@
 
 class Point {
 public:
-    // Coordenadas originais no "mundo", em metros (SRU)
+    // metros (SRU)
     float world_x;
     float world_y;
 
-    // Coordenadas calculadas na "tela", em pixels (SRD)
+    // pixels (SRD)
     int screen_x;
     int screen_y;
 
@@ -21,9 +21,6 @@ public:
         if (metersX <= 0.0f || metersY <= 0.0f) return;
 
         screen_x = static_cast<int>((world_x / metersX) * screenWidth);
-
-        // Inverte o eixo Y para que (0,0) do mundo (inferior-esquerdo)
-        // corresponda ao sistema da tela (superior-esquerdo)
         screen_y = static_cast<int>(((metersY - world_y) / metersY) * screenHeight);
         this->print();
     }

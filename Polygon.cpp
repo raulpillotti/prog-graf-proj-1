@@ -29,7 +29,6 @@ void Polygon::normalize(float metersX, float metersY, int screenWidth, int scree
 void Polygon::draw(SDL_Surface* surface) {
     if (normalizedPoints.size() < 3 || !surface) return;
 
-
     int minY = normalizedPoints[0].screen_y;
     int maxY = normalizedPoints[0].screen_y;
 
@@ -44,7 +43,7 @@ void Polygon::draw(SDL_Surface* surface) {
         for (size_t i = 0; i < normalizedPoints.size(); ++i) {
             if ((normalizedPoints[i].screen_y < y && normalizedPoints[j].screen_y >= y) ||
                 (normalizedPoints[j].screen_y < y && normalizedPoints[i].screen_y >= y)) {
-                
+
                 float x = normalizedPoints[i].screen_x +
                           (float)(y - normalizedPoints[i].screen_y) * (normalizedPoints[j].screen_x - normalizedPoints[i].screen_x) /
                           (float)(normalizedPoints[j].screen_y - normalizedPoints[i].screen_y);

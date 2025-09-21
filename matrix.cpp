@@ -1,12 +1,10 @@
 #include "matrix.h"
-#include <cmath> // Para sin() e cos()
+#include <cmath>
 
-// Define M_PI se não estiver disponível (padrão no C++)
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-// Construtor: cria uma matriz identidade
 Matrix::Matrix() {
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
@@ -72,4 +70,3 @@ Matrix Matrix::rotation(float degrees, const Point& pivot) {
 
     return fromOrigin.multiply(rot.multiply(toOrigin));
 }
-

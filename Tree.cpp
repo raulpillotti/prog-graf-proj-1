@@ -6,7 +6,6 @@
 Tree::Tree() {}
 
 void Tree::build(float x, float y, float width, float height, Uint32 trunkColor, Uint32 leavesColor, float inclination) {
-    // CORREÇÃO: (x, y) é o canto INFERIOR esquerdo da base do tronco
     float trunkWidth = width * 0.2f;
     float trunkHeight = height * 0.5f;
     trunk.setPoints({

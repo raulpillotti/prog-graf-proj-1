@@ -4,7 +4,6 @@
 Sun::Sun() : body(Point(0,0), 0, 0) {}
 
 void Sun::build(float x, float y, float width, float height, Uint32 color) {
-    // CORREÇÃO: (x, y) é o canto INFERIOR esquerdo da caixa delimitadora do sol
     float radius = (width + height) / 4.0f;
     float centerX = x + width / 2.0f;
     float centerY = y + height / 2.0f;
