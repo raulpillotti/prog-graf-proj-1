@@ -8,21 +8,21 @@ void House::build(float x, float y, float width, float height,
                   Uint32 wallColor, Uint32 roofColor, Uint32 doorColor,
                   float inclination) {
     // Parede
+    float roofHeight = height * 0.5f;
     wall.setPoints({
         Point(x, y),
         Point(x + width, y),
-        Point(x + width, y + height),
-        Point(x, y + height)
+        Point(x + width, (y + height) - roofHeight),
+        Point(x, (y + height) - roofHeight)
     });
     wall.setColor(wallColor);
 
     // Telhado
-    float roofHeight = height * 0.5f;
     float roofOverhang = width * 0.1f;
     roof.setPoints({
-        Point(x - roofOverhang, y + height),
-        Point(x + width + roofOverhang, y + height),
-        Point(x + width / 2.0f, y + height + roofHeight)
+        Point(x - roofOverhang, (y + height) - roofHeight),
+        Point(x + width + roofOverhang, (y + height) - roofHeight),
+        Point(x + width / 2.0f, y + height)
     });
     roof.setColor(roofColor);
 
