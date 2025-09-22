@@ -112,11 +112,6 @@ void App::parseCSV(const std::string& filename) {
             continue;
         }
 
-        if (key.rfind("Cor:", 0) == 0 && currentObjectType == "Sol") {
-            c1 = parseColor(key);
-            continue;
-        }
-
         if (tokens.size() < 2) continue;
         const std::string& value = tokens[1];
 
@@ -140,6 +135,8 @@ void App::parseCSV(const std::string& filename) {
             if (key == "CorTronco") c1 = parseColor(value);
             else if (key == "CorFolhas") c2 = parseColor(value);
         } else if (currentObjectType == "Cerca") {
+            if (key == "Cor") c1 = parseColor(value);
+        } else if (currentObjectType == "Sol") {
             if (key == "Cor") c1 = parseColor(value);
         }
     }
